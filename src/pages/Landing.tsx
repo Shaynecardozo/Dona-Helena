@@ -5,6 +5,10 @@ import LandingNavbar from "@/components/LandingNavbar";
 // import heroBackground from "@/assets/hero-background.jpg";
 import heroBackground from "@/assets/Image1.jpg";
 import logo from "@/assets/dona-helena-logo.jpg";
+import { Waves } from "lucide-react";
+import { Bed } from "lucide-react";
+import { Sun } from "lucide-react";
+
 
 const Landing = () => {
   return <div className="min-h-screen">
@@ -58,26 +62,27 @@ const Landing = () => {
           
           <div className="grid md:grid-cols-3 gap-8">
             <div className="p-6 rounded-lg bg-card shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-elegant)] transition-all duration-300">
-              <Calendar className="w-12 h-12 text-primary mb-4" />
-              <h3 className="text-xl font-semibold mb-2">Why Choose Dona Helena?</h3>
+              <Waves className="w-12 h-12 text-primary mb-4" />
+              <h3 className="text-xl font-semibold mb-2">Beach Vicinity</h3>
               <p className="text-muted-foreground">
-                Book your preferred room in just a few clicks with our intuitive interface
+                Stay just minutes away from the pristine Goan shoreline and enjoy the calming sea breeze every day.
+              </p>
+
+            </div>
+
+            <div className="p-6 rounded-lg bg-card shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-elegant)] transition-all duration-300">
+              <Bed className="w-12 h-12 text-primary mb-4" />
+              <h3 className="text-xl font-semibold mb-2">Spaceous Rooms</h3>
+              <p className="text-muted-foreground">
+                Relax in our large, well-designed rooms crafted for comfort, convenience, and an effortlessly cozy stay.
               </p>
             </div>
 
             <div className="p-6 rounded-lg bg-card shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-elegant)] transition-all duration-300">
-              <Shield className="w-12 h-12 text-primary mb-4" />
-              <h3 className="text-xl font-semibold mb-2">Secure Payments</h3>
+              <Sun className="w-12 h-12 text-primary mb-4" />
+              <h3 className="text-xl font-semibold mb-2">Goan Culture</h3>
               <p className="text-muted-foreground">
-                Your information is protected with enterprise-level security
-              </p>
-            </div>
-
-            <div className="p-6 rounded-lg bg-card shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-elegant)] transition-all duration-300">
-              <Star className="w-12 h-12 text-primary mb-4" />
-              <h3 className="text-xl font-semibold mb-2">Premium Rooms</h3>
-              <p className="text-muted-foreground">
-                Choose from our curated selection of luxury accommodations
+                Immerse yourself in authentic Goan traditions, warm hospitality, and a truly local holiday experience.
               </p>
             </div>
           </div>

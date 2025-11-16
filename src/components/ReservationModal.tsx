@@ -11,6 +11,8 @@ import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "@/hooks/use-toast";
+import emailjs from "@emailjs/browser";
+
 
 interface ReservationModalProps {
   isOpen: boolean;
@@ -33,116 +35,6 @@ const ReservationModal = ({ isOpen, onClose, roomId, roomName, onSuccess }: Rese
   const [isCheckOutOpen, setCheckOutOpen] = useState(false);
 
 
-//   const handleReserve = async () => {
-//     // Validation
-//     if (!userName.trim()) {
-//       toast({
-//         title: "Missing information",
-//         description: "Please enter your name",
-//         variant: "destructive",
-//       });
-//       return;
-//     }
-
-//     if (!userEmail.trim()) {
-//       toast({
-//         title: "Missing information",
-//         description: "Please enter your email",
-//         variant: "destructive",
-//       });
-//       return;
-//     }
-
-//     if (!checkIn || !checkOut) {
-//       toast({
-//         title: "Missing dates",
-//         description: "Please select both check-in and check-out dates",
-//         variant: "destructive",
-//       });
-//       return;
-//     }
-
-//     if (checkOut <= checkIn) {
-//       toast({
-//         title: "Invalid dates",
-//         description: "Check-out date must be after check-in date",
-//         variant: "destructive",
-//       });
-//       return;
-//     }
-
-//     setLoading(true);
-//     try {
-//       const { error } = await supabase.from("reservations").insert({
-//         // user_id: user!.id,
-//         user_id:null,
-//         room_id: roomId,
-//         user_name: userName,
-//         user_email: userEmail,
-//         user_phone: userPhone || null,
-//         check_in: format(checkIn, "yyyy-MM-dd"),
-//         check_out: format(checkOut, "yyyy-MM-dd"),
-//         notes:roomNotes,
-//       });
-
-//       if (error) throw error;
-
-//       // Update room availability
-//       await supabase
-//         .from("rooms")
-//         .update({ is_available: false })
-//         .eq("id", roomId);
-
-//       // Call edge function to send emails
-//       // await supabase.functions.invoke("send-reservation-email", {
-//       //   body: {
-//       //     roomName,
-//       //     checkIn: format(checkIn, "PPP"),
-//       //     checkOut: format(checkOut, "PPP"),
-//       //     userName,
-//       //     userEmail,
-//       //     userPhone,
-//       //   },
-//       // });
-
-//       await supabase.functions.invoke("send-reservation-email", {
-//   body: JSON.stringify({
-//     roomName,
-//     checkIn: format(checkIn, "PPP"),
-//     checkOut: format(checkOut, "PPP"),
-//     userName,
-//     userEmail,
-//     userPhone,
-//   }),
-//   headers: {
-//     "Content-Type": "application/json",
-//   },
-// });
-
-
-//       toast({
-//         title: "Reservation confirmed!",
-//         description: "You'll receive a confirmation email shortly.",
-//       });
-
-//       onSuccess();
-//       onClose();
-//       // Reset form
-//       setUserName("");
-//       setUserEmail("");
-//       setUserPhone("");
-//       setCheckIn(undefined);
-//       setCheckOut(undefined);
-//     } catch (error: any) {
-//       toast({
-//         title: "Reservation failed",
-//         description: error.message,
-//         variant: "destructive",
-//       });
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
 
 const handleReserve = async () => {
    console.log("Reserving room with ID:", roomId); 
@@ -179,14 +71,46 @@ const handleReserve = async () => {
 
 
     if (error) throw error;
-
+    function generateReservationId() {
+      return Math.floor(1000000000 + Math.random() * 9000000000).toString();
+    }
+    const reservationId = generateReservationId();
+    // toast({
+    //   title: "Reservation confirmed!",
+    //   description: "You'll receive a confirmation email shortly.",
+    // });
     toast({
       title: "Reservation confirmed!",
       description: "You'll receive a confirmation email shortly.",
     });
 
+    try {
+      await emailjs.send(
+        "service_89b6knt", 
+        "template_8k1qa2f", 
+        {
+          reservation_id: reservationId,
+          user_name: userName,
+          user_email: userEmail,
+          user_phone: userPhone,
+          room_name: roomName,
+          check_in: format(checkIn, "PPP"),
+          check_out: format(checkOut, "PPP"),
+          notes: roomNotes || "No additional notes",
+        },
+        "spqkV3EGeeHLXN06u" 
+      );
+
+      console.log("Email sent successfully!");
+    } catch (emailError) {
+      console.error("Error sending email:", emailError);
+    }
+
+
     onSuccess(); // refresh rooms in the Dashboard
     onClose();
+    
+
 
     // reset form
     setUserName("");
@@ -210,7 +134,9 @@ const handleReserve = async () => {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[550px] max-h-[90vh] overflow-y-auto">
+      {/* <DialogContent className="sm:max-w-[550px] max-h-[90vh] overflow-y-auto"> */}
+      <DialogContent className="w-[95vw] sm:max-w-[550px] max-h-[85vh] overflow-y-auto p-4 sm:p-6 rounded-lg">
+
         <DialogHeader>
           <DialogTitle>Reserve {roomName}</DialogTitle>
           <DialogDescription>
@@ -292,7 +218,13 @@ const handleReserve = async () => {
                 {checkIn ? format(checkIn, "PPP") : "Select date"}
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
+            {/* <PopoverContent className="w-auto p-0" align="start"> */}
+            <PopoverContent 
+  className="w-[90vw] sm:w-auto p-0" 
+  align="start"
+  sideOffset={8}
+>
+
               <Calendar
                 mode="single"
                 selected={checkIn}
@@ -349,7 +281,13 @@ const handleReserve = async () => {
                 {checkOut ? format(checkOut, "PPP") : "Select date"}
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
+            {/* <PopoverContent className="w-auto p-0" align="start"> */}
+            <PopoverContent 
+  className="w-[90vw] sm:w-auto p-0" 
+  align="start"
+  sideOffset={8}
+>
+
               <Calendar
                 mode="single"
                 selected={checkOut}
@@ -376,7 +314,8 @@ const handleReserve = async () => {
           </div>
         </div>
 
-        <DialogFooter>
+        {/* <DialogFooter> */}
+        <DialogFooter className="flex flex-col sm:flex-row gap-2">
           <Button variant="outline" onClick={onClose}>
             Cancel
           </Button>
@@ -388,5 +327,6 @@ const handleReserve = async () => {
     </Dialog>
   );
 };
+
 
 export default ReservationModal;
